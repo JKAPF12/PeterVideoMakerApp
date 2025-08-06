@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+openai
+firebase-admin
+python-dotenv
+moviepy
+whisper  # or whisper dependency you use
+opencv-python
+tqdm
+psutil

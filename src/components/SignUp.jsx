@@ -1,0 +1,36 @@
+import { useState } from "react";
+import { createUserWithEmailAndPassword as firebaseSignUp } from "firebase/auth";
+import { auth } from "../firebase";
+import { Link, useNavigate } from "react-router-dom";
+
+export default function SignUp() {
+  const [email, setEmail] = useState("");
+  const [pass, setPass] = useState("");
+  const [err, setErr] = useState("");
+  const navigate = useNavigate();
+
+  const submit = async (e) => {
+    e.preventDefault();
+    try {
+      await firebaseSignUp(auth, email, pass);
+      navigate("/");
+    } catch (e) {
+      setErr(e.message);
+    }
+  };
+
+  return (
+    <div className="card">
+      <h2>Sign Up</h2>
+      <form onSubmit={submit}>
+        <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+        <input placeholder="Password" type="password" value={pass} onChange={e => setPass(e.target.value)} required />
+        <button type="submit">Create account</button>
+      </form>
+      {err && <div className="error">{err}</div>}
+      <div>
+        Already have one? <Link to="/login">Log in</Link>
+      </div>
+    </div>
+  );
+}
