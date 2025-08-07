@@ -27,57 +27,71 @@ export default function VideoCreator() {
   const [videoUrl, setVideoUrl] = useState(null);
   const [error, setError] = useState("");
 
-  const submit = async (e) => {
-    e.preventDefault();
+ const submit = async (e) => {
+  e.preventDefault();
 
-    if (prompt.trim().split(/\s+/).length > 20) {
-      setError("Prompt max 20 words.");
-      return;
+  if (prompt.trim().split(/\s+/).length > 20) {
+    setError("Prompt max 20 words.");
+    return;
+  }
+  if (credits < 1) {
+    setError("No credits left.");
+    return;
+  }
+
+  setError("");
+  setStage("waiting");
+
+  try {
+    // 1️⃣ Get Firebase token
+    const token = await getAuth().currentUser.getIdToken();
+
+    // 2️⃣ Send job request
+    const API_BASE = import.meta.env.VITE_API_BASE;
+    console.log("🌍 API_BASE is:", API_BASE);
+
+    const res = await fetch(`${API_BASE}/generate-video`, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        topic: prompt,
+        characters: chars,
+        song,
+        type: "spongebob"
+      }),
+    });
+
+    const data = await res.json();
+    console.log("🚀 POST /generate-video response:", res.status);
+    console.log("🎯 JSON data:", data);
+
+    if (!res.ok) {
+      throw new Error(data.error || "Failed to start job");
     }
-    if (credits < 1) {
-      setError("No credits left.");
-      return;
-    }
 
-    setError("");
-    setStage("waiting");
+    const jobId = data.jobId;
+    console.log("🎬 Job ID:", jobId);
 
-    try {
-      // 1️⃣ Get Firebase token
-      const token = await getAuth().currentUser.getIdToken();
+    // 3️⃣ Poll job status every 5 sec
+    let done = false;
+    while (!done) {
+      await new Promise(r => setTimeout(r, 5000));
 
-      // 2️⃣ Send job request
-      const API_BASE = import.meta.env.VITE_API_BASE;
-
-      const res = await fetch(`${API_BASE}/generate-video`, {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          topic: prompt,
-          characters: chars,
-          song,
-          type: "spongebob"
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to start job");
-      }
-
-      const jobId = data.jobId;
-
-      // 3️⃣ Poll job status every 5 sec
-      let done = false;
-      while (!done) {
-        await new Promise(r => setTimeout(r, 5000));
+      try {
         const statusRes = await fetch(`${API_BASE}/job-status/${jobId}`);
-        const statusData = await statusRes.json();  // <-- missing line
-        setVideoUrl(`${API_BASE}/videos/${jobId}.mp4`);
+        console.log("📡 Status:", statusRes.status);
+
+        if (!statusRes.ok) {
+          const body = await statusRes.text();
+          console.error("❌ Response body:", body);
+          throw new Error("Failed to get job status");
+        }
+
+        const statusData = await statusRes.json();
+        console.log("🔁 Job status:", statusData);
 
         if (statusData.status === "done") {
           await deductCredit();
@@ -89,14 +103,23 @@ export default function VideoCreator() {
           setStage("idle");
           done = true;
         }
-      }
 
-    } catch (err) {
-      console.error(err);
-      setError("Error connecting to backend.");
-      setStage("idle");
+      } catch (err) {
+        console.error("🛑 Polling failed:", err);
+        setError("Lost connection to backend while checking job status.");
+        setStage("idle");
+        done = true;
+      }
     }
-  };
+
+  } catch (err) {
+    console.error("💥 Error starting job:", err);
+    setError("Error connecting to backend.");
+    setStage("idle");
+  }
+};
+
+
 
   const toggleChar = (c) => {
     setChars((prev) =>

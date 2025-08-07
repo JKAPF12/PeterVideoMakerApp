@@ -29,7 +29,7 @@ CharacterName: "Follow for endless wisdom"
 
 Character Names are INCREDIBLY important not to mess up. For example you must not write full names, if it was peter griffin just write peter. If it is lebron james just write lebron. If it is bugs bunny just write bugs! Haha. But be wise in context, not Mr. Krabs, just Krabs, always keep it 1 word. You will soon have a more proper list of allowed names.
 
-- The final line must end with exactly: "Follow for endless wisdom".  
+- The final line must end with exactly: "Follow for endless wisdom".  crap that For now literally just make peter say "hello folks"
 6. **Tone**:  
 - Clear, concise, and engaging speech.  
 - Short sentences or split long ideas into multiple line.  
@@ -43,7 +43,10 @@ Character Names are INCREDIBLY important not to mess up. For example you must no
 9. Variety: Distribute meaningful line across the characters instead of having one do all the talking.
 
 Output must be in the exact dialogue format with no extra commentary or explanation.
-
+For now literally just make peter say "hello folks"
+For now literally just make peter say "hello folks"
+For now literally just make peter say "hello folks"
+For now literally just make peter say "hello folks"
 For now pls make all scripts 1 line.
 """
 
