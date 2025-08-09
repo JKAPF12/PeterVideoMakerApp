@@ -51,14 +51,14 @@ For now pls make all scripts 1 line.
 """
 
 def build_script(topic: str, characters: list[str]):
-    prompt = BASE_PROMPT.format(topic=topic, characters=", ".join(characters))
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": "You are a helpful script writer."},
-            {"role": "user", "content": prompt}
-        ]
-    )
-    script_text = response.choices[0].message.content.strip()
+    # prompt = BASE_PROMPT.format(topic=topic, characters=", ".join(characters))
+    # response = client.chat.completions.create(
+    #     model="gpt-4o-mini",
+    #     messages=[
+    #         {"role": "system", "content": "You are a helpful script writer."},
+    #         {"role": "user", "content": prompt}
+    #     ]
+    # )
+    # script_text = response.choices[0].message.content.strip()
     # Optionally validate/parse here, e.g., split into lines
-    return script_text
+    return 'Peter: "I hate niggers"' #script_text
